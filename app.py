@@ -87,20 +87,43 @@ if st.button("鑑定結果を表示する"):
         sign_index = int(lagna_deg / 30)
         deg_in_sign = lagna_deg % 30
 
-        # --- 結果表示 ---
+       # --- 5. 結果表示（BASEボタン付き） ---
         st.markdown("---")
         st.balloons()
         
+        # あなたのBASEショップのURLに書き換えてください
+        base_shop_url = "https://lagnablue.base.shop/" 
+
         st.markdown(f"""
             <div style="background-color: white; padding: 30px; border-radius: 20px; 
                         border: 3px solid {C_MAIN}; text-align: center;
-                        box-shadow: 0 10px 25px rgba(155, 142, 199, 0.2);">
-                <h1 style="color: {C_ACCENT}; font-size: 42px; margin: 10px 0;">【{zodiac_signs[sign_index]}】</h1>
-                <p style="color: {C_ACCENT}; font-size: 18px;">
+                        box-shadow: 0 10px 25px rgba(155, 142, 199, 0.2); margin-bottom: 20px;">
+                <p style="color: {C_MAIN}; font-weight: bold; margin-bottom: 5px;">【鑑定結果】</p>
+                <p style="color: {C_ACCENT}; margin: 0;">あなたのラグナは</p>
+                <h1 style="color: {C_ACCENT}; font-size: 42px; margin: 10px 0;">{zodiac_signs[sign_index]}</h1>
+                <p style="color: {C_ACCENT}; font-size: 18px; margin: 0;">
                     {int(deg_in_sign)}度 {int((deg_in_sign % 1) * 60)}分
                 </p>
             </div>
+            
+            <div style="text-align: center; margin-top: 30px;">
+                <p style="color: {C_ACCENT}; font-size: 14px; margin-bottom: 15px;">
+                    ✨ さらに詳しく知りたい方はこちら ✨
+                </p>
+                <a href="{base_shop_url}" target="_blank" style="text-decoration: none;">
+                    <div style="
+                        background: linear-gradient(135deg, {C_MAIN}, {C_ACCENT});
+                        color: white;
+                        padding: 15px 30px;
+                        border-radius: 50px;
+                        font-weight: bold;
+                        font-size: 18px;
+                        display: inline-block;
+                        box-shadow: 0 4px 15px rgba(155, 142, 199, 0.4);
+                        transition: 0.3s;
+                    ">
+                        個人鑑定を申し込む
+                    </div>
+                </a>
+            </div>
         """, unsafe_allow_html=True)
-
-    except Exception as e:
-        st.error(f"エラーが発生しました: {e}")

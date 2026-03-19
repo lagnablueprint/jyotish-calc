@@ -104,8 +104,28 @@ if st.button("計算を実行する"):
         sign_index = int(lagna_deg_raw / 30)
 
         # 結果表示
-        st.markdown("---")
-        st.success(f"あなたのラグナは 【{zodiac_signs[sign_index]}】 です")
+        st.balloons()
+        
+        # HTMLで直接デザインを指定します
+        result_html = f"""
+        <div style="
+            background-color: #1e1b4b; 
+            color: #fbbf24; 
+            padding: 20px; 
+            border-radius: 15px; 
+            border: 2px solid #fbbf24; 
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            box-shadow: 0px 4px 15px rgba(0,0,0,0.3);
+        ">
+            あなたのラグナは 【{zodiac_signs[sign_index]}】 です
+        </div>
+        """
+        st.markdown(result_html, unsafe_allow_html=True)
+        
+        # 詳細情報の表示
+        st.write(f"<p style='color: #e2e8f0; text-align: center;'>詳細度数: {lagna_deg_raw % 30:.2f}° / 出生地: {pref_name}</p>", unsafe_allow_html=True)
         
         # ずれを確認するための詳細情報
         col1, col2 = st.columns(2)

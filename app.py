@@ -86,22 +86,17 @@ pref_name = st.selectbox("3. 出生地", list(PREFECTURES.keys()), index=0)
 
 if st.button("鑑定結果を表示する"):
     try:
-        # 時刻計算 (JST -> UT)
+        # 1. 時間計算 (JST -> UT)
         dt_local = datetime.combine(birth_date, birth_time)
         dt_ut = dt_local - timedelta(hours=9)
-        
-        # ユリウス日の計算
         jd_ut = swe.julday(dt_ut.year, dt_ut.month, dt_ut.day, dt_ut.hour + dt_ut.minute/60.0)
 
-        # アヤナムシャの厳密設定（ラヒリに固定）
-        swe.set_sid_mode(swe.SIDM_LAHIRI, 0, 0)
+        # 2. アヤナムシャ設定 (Lahiri)
+        swe.set_sid_mode(1, 0, 0)
         
-        # 緯度・経度の取得
+        # 3. ラグナ算出
         lat, lon = PREFECTURES[pref_name]
-        
-        # ラグナ算出 (Whole Sign / Sidereal)
-        # flags=swe.FLG_SIDEREAL (64) を明示
-        res = swe.houses_ex(jd_ut, lat, lon, b'W', flags=swe.FLG_SIDEREAL)
+        res = swe.houses_ex(jd_ut, lat, lon, b'W', flags=64)
         lagna_deg = res[1][0]
 
         zodiac_signs = ["牡羊座", "牡牛座", "双子座", "蟹座", "獅子座", "乙女座", 
@@ -109,11 +104,11 @@ if st.button("鑑定結果を表示する"):
         sign_index = int(lagna_deg / 30)
         deg_in_sign = lagna_deg % 30
 
-       # --- 5. 結果表示（BASEボタン付き） ---
+        # --- 4. 結果表示 ---
         st.markdown("---")
         st.balloons()
         
-        # あなたのBASEショップのURLに書き換えてください
+        # BASEショップのURL（ご自身のものに書き換えてください）
         base_shop_url = "https://lagnablue.base.shop/" 
 
         st.markdown(f"""
@@ -135,17 +130,16 @@ if st.button("鑑定結果を表示する"):
                 <a href="{base_shop_url}" target="_blank" style="text-decoration: none;">
                     <div style="
                         background: linear-gradient(135deg, {C_MAIN}, {C_ACCENT});
-                        color: white;
-                        padding: 15px 30px;
-                        border-radius: 50px;
-                        font-weight: bold;
-                        font-size: 18px;
-                        display: inline-block;
+                        color: white; padding: 15px 30px; border-radius: 50px;
+                        font-weight: bold; font-size: 18px; display: inline-block;
                         box-shadow: 0 4px 15px rgba(155, 142, 199, 0.4);
-                        transition: 0.3s;
                     ">
                         個人鑑定を申し込む
                     </div>
                 </a>
             </div>
         """, unsafe_allow_html=True)
+
+    except Exception as e:
+        # ここが SyntaxError の原因だった except ブロックです
+        st.error(f"エラーが発生しました: {e}")

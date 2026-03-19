@@ -21,47 +21,48 @@ PREFECTURES = {
     "熊本県": [32.7898, 130.7417], "大分県": [33.2382, 131.6126], "宮崎県": [31.9077, 131.4202],
     "鹿児島県": [31.5601, 130.5580], "沖縄県": [26.2124, 127.6809]
 }
-
-# --- 2. 画面構成 ---
-st.set_page_config(page_title="ジョーティッシュ・ラグナ計算機", page_icon="✨")
-st.title("✨ ジョーティッシュ・ラグナ計算機")
+st.set_page_config(page_title="精密ジョーティッシュ計算機", page_icon="☸️")
+st.title("☸️ 精密ラグナ算出ツール")
 
 # 入力フォーム
-st.header("出生データを入力してください")
+birth_date = st.date_input("誕生日", datetime(1990, 1, 1))
+birth_time = st.time_input("出生時刻 (1分単位)", time(12, 0), step=60)
+pref_name = st.selectbox("出生地", list(PREFECTURES.keys()), index=0)
 
-birth_date = st.date_input("1. 誕生日", datetime(1990, 1, 1))
-
-# 時間入力を1分単位にするための設定
-birth_time = st.time_input("2. 出生時刻 (1分単位で選べます)", time(12, 0), step=60)
-
-# 都道府県の選択
-pref_name = st.selectbox("3. 出生地（都道府県）", list(PREFECTURES.keys()), index=12) # 初期値は東京都
-lat, lon = PREFECTURES[pref_name]
-
-if st.button("ラグナを計算する"):
+if st.button("計算を実行する"):
     try:
-        # 日本時間から世界時(UT)に変換（正確に9時間を引く）
+        # 1. 時間の補正 (日本時間から世界時UTへ)
         dt_local = datetime.combine(birth_date, birth_time)
         dt_ut = dt_local - timedelta(hours=9)
+        jd = swe.julday(dt_ut.year, dt_ut.month, dt_ut.day, dt_ut.hour + dt_ut.minute/60.0)
+
+        # 2. アヤナムシャの厳密な設定 (ラヒリ)
+        swe.set_sid_mode(swe.SIDM_LAHIRI, 0, 0)
         
-        # ユリウス日の計算
-        jd = swe.julday(dt_ut.year, dt_ut.month, dt_ut.day, dt_ut.hour + dt_ut.minute/60.0 + dt_ut.second/3600.0)
-        
-        # 占星術計算の設定
-        swe.set_sid_mode(swe.SIDM_LAHIRI) # ラヒリ・アヤナムシャ
-        
-        # ハウス計算 (Whole Sign方式)
-        res = swe.houses_ex(jd, lat, lon, b'W', flags=1)
-        ascmc = res[1]
-        
+        # 3. アヤナムシャの値を取得（確認用）
+        ayan_value = swe.get_ayanamsa_ex(jd, flags=swe.FLG_SIDEREAL)[0]
+
+        # 4. ハウスとアセンダント(ラグナ)の算出
+        # flags=swe.FLG_SIDEREAL を明示的に指定してインド式計算を強制します
+        res = swe.houses_ex(jd, PREFECTURES[pref_name][0], PREFECTURES[pref_name][1], b'W', flags=swe.FLG_SIDEREAL)
+        lagna_deg_raw = res[1][0] # これがアヤナムシャ適用済みのラグナ度数
+
         zodiac_signs = ["牡羊座", "牡牛座", "双子座", "蟹座", "獅子座", "乙女座", 
                         "天秤座", "蠍座", "射手座", "山羊座", "水瓶座", "魚座"]
-        sign_index = int(ascmc[0] / 30)
-        
-        # 結果の表示
+        sign_index = int(lagna_deg_raw / 30)
+
+        # 結果表示
         st.markdown("---")
         st.success(f"あなたのラグナは 【{zodiac_signs[sign_index]}】 です")
-        st.info(f"詳細度数: {ascmc[0] % 30:.2f}° / 出生地: {pref_name} (緯度:{lat}, 経度:{lon})")
         
+        # ずれを確認するための詳細情報
+        col1, col2 = st.columns(2)
+        with col1:
+            st.metric("ラグナ度数（星座内）", f"{lagna_deg_raw % 30:.2f}°")
+        with col2:
+            st.metric("適用アヤナムシャ", f"{ayan_value:.2f}°")
+        
+        st.write("※西洋占星術（サヤナ）とは約24度異なります。")
+
     except Exception as e:
-        st.error(f"エラーが発生しました: {e}")
+        st.error(f"計算エラー: {e}")

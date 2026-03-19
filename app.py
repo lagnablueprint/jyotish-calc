@@ -52,36 +52,34 @@ PREFECTURES = {
     "熊本県": [32.7898, 130.7417], "大分県": [33.2382, 131.6126], "宮崎県": [31.9077, 131.4202],
     "鹿児島県": [31.5601, 130.5580], "沖縄県": [26.2124, 127.6809]
 }
-# --- 5. 入力フォーム ---
-# 日付エラー回避のため、明示的に datetime 型として扱います
+# --- 5. 入力フォーム（初期値1980年、範囲1960年〜） ---
 birth_date = st.date_input(
     "1. 誕生日を選択", 
     value=datetime(1980, 1, 1),
     min_value=datetime(1950, 1, 1),
     max_value=datetime.now()
 )
-birth_time = st.time_input("出生時刻", value=time(12, 0), step=60)
-pref_name = st.selectbox("出生地", list(PREFECTURES.keys()), index=0)
+birth_time = st.time_input("2. 出生時刻", value=time(10, 58), step=60)
+pref_name = st.selectbox("3. 出生地", list(PREFECTURES.keys()), index=0)
 
 if st.button("鑑定を実行する"):
     try:
-        # 日付と時刻を結合（ここでのエラーを防ぐため型変換を強化）
-        y, m, d = birth_date.year, birth_date.month, birth_date.day
-        hh, mm = birth_time.hour, birth_time.minute
+        # 時刻計算 (JST -> UT)
+        dt_local = datetime.combine(birth_date, birth_time)
+        dt_ut = dt_local - timedelta(hours=9)
         
-        # 日本時間(JST)から世界時(UT)へ変換（-9時間）
-        local_dt = datetime(y, m, d, hh, mm)
-        ut_dt = local_dt - timedelta(hours=9)
-        
-        # ユリウス日の計算 (精密版)
-        jd_ut = swe.julday(ut_dt.year, ut_dt.month, ut_dt.day, ut_dt.hour + ut_dt.minute/60.0)
+        # ユリウス日の計算
+        jd_ut = swe.julday(dt_ut.year, dt_ut.month, dt_ut.day, dt_ut.hour + dt_ut.minute/60.0)
 
-        # アヤナムシャ設定
-        swe.set_sid_mode(1, 0, 0) # 1 = Lahiri
+        # アヤナムシャの厳密設定（ラヒリに固定）
+        swe.set_sid_mode(swe.SIDM_LAHIRI, 0, 0)
         
-        # ラグナ算出
+        # 緯度・経度の取得
         lat, lon = PREFECTURES[pref_name]
-        res = swe.houses_ex(jd_ut, lat, lon, b'W', flags=64) # 64 = Sidereal
+        
+        # ラグナ算出 (Whole Sign / Sidereal)
+        # flags=swe.FLG_SIDEREAL (64) を明示
+        res = swe.houses_ex(jd_ut, lat, lon, b'W', flags=swe.FLG_SIDEREAL)
         lagna_deg = res[1][0]
 
         zodiac_signs = ["牡羊座", "牡牛座", "双子座", "蟹座", "獅子座", "乙女座", 
@@ -92,6 +90,7 @@ if st.button("鑑定を実行する"):
         # --- 結果表示 ---
         st.markdown("---")
         st.balloons()
+        
         st.markdown(f"""
             <div style="background-color: white; padding: 30px; border-radius: 20px; 
                         border: 3px solid {C_MAIN}; text-align: center;
@@ -104,4 +103,4 @@ if st.button("鑑定を実行する"):
         """, unsafe_allow_html=True)
 
     except Exception as e:
-        st.error(f"計算にエラーが発生しました: {e}")
+        st.error(f"エラーが発生しました: {e}")

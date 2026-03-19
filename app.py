@@ -16,7 +16,7 @@ st.markdown("""
     /* 2. 入力ボックス（枠）の色 */
     div[data-baseweb="select"] > div, 
     div[data-baseweb="input"] > div {
-        background-color: #1e293b !important; /* 入力欄の中を少し明るい紺に */
+        background-color: #92aac7 !important; /* 入力欄の中を少し明るい紺に */
         color: #f1f5f9 !important; /* 入力する文字を白っぽく */
         border: 1px solid #38bdf8 !important; /* 枠線を水色に */
     }

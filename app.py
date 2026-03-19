@@ -8,49 +8,23 @@ C_SUB = "#B4D3D9"
 C_MAIN = "#BDA6CE"
 C_ACCENT = "#9B8EC7"
 
-# --- 2. デザイン (CSS) ---
-st.set_page_config(page_title="Lagna Blueprint", page_icon="✨")
-
+# --- デザイン設定 (CSS) ---
 st.markdown(f"""
     <style>
-    .stApp {{ background-color: {C_BG}; }}
-    h1, h2, h3, label {{ color: {C_ACCENT} !important; font-weight: bold; }}
-    .stButton>button {{
-        background: linear-gradient(135deg, {C_MAIN}, {C_ACCENT});
-        color: white !important; border-radius: 25px; border: none;
-        height: 3.5em; width: 100%; font-weight: bold;
-    }}
-    /* 入力欄の背景を白に固定 */
-    .stDateInput div, .stTimeInput div, .stSelectbox div {{
-        background-color: white !important;
-    }}
-    </style>
-    st.markdown(f"""
-    <style>
-    /* 1. 右上のツールバー（GitHubアイコン、Deployボタン等）を完全に消去 */
+    /* 1. ヘッダー（GitHubアイコン等）を完全に消去 */
     header[data-testid="stHeader"] {{
         display: none !important;
     }}
 
-    /* 2. 一番下のフッター（Streamlitロゴとアカウント名）を完全に消去 */
+    /* 2. フッター（アカウント名等）を完全に消去 */
     footer {{
         display: none !important;
     }}
 
-    /* 3. 右上の三本線メニューを完全に消去 */
+    /* 3. メニューボタンを完全に消去 */
     #MainMenu {{
         display: none !important;
     }}
-
-    /* 4. アプリ全体の余白調整（ヘッダーを消した分、上に詰めすぎないようにする） */
-    .block-container {{
-        padding-top: 2rem !important;
-    }}
-
-    /* 背景色やその他のデザインは維持 */
-    .stApp {{ background-color: {C_BG}; }}
-    </style>
-    """, unsafe_allow_html=True)
 
 # --- 3. ヘッダー画像の表示 ---
 try:

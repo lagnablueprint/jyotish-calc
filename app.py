@@ -123,16 +123,20 @@ if st.button("鑑定結果を表示する"):
                 </p>
             </div>
             
-            <div style="text-align: center; margin-top: 30px;">
-                <p style="color: {C_ACCENT}; font-size: 14px; margin-bottom: 15px;">
+            <div style="text-align: center; margin-top: 60px;">
+                <p style="color: {C_ACCENT}; font-size: 13px; margin-bottom: 12px; opacity: 0.8;">
                     ✨ さらに詳しく知りたい方はこちら ✨
                 </p>
                 <a href="{base_shop_url}" target="_blank" style="text-decoration: none;">
                     <div style="
                         background: linear-gradient(135deg, {C_MAIN}, {C_ACCENT});
-                        color: white; padding: 15px 30px; border-radius: 50px;
-                        font-weight: bold; font-size: 18px; display: inline-block;
-                        box-shadow: 0 4px 15px rgba(155, 142, 199, 0.4);
+                        color: white; 
+                        padding: 10px 24px; 
+                        border-radius: 50px;
+                        font-weight: bold; 
+                        font-size: 15px; 
+                        display: inline-block;
+                        box-shadow: 0 3px 10px rgba(155, 142, 199, 0.3);
                     ">
                         個人鑑定を申し込む
                     </div>
@@ -141,5 +145,4 @@ if st.button("鑑定結果を表示する"):
         """, unsafe_allow_html=True)
 
     except Exception as e:
-        # ここが SyntaxError の原因だった except ブロックです
         st.error(f"エラーが発生しました: {e}")

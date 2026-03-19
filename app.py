@@ -10,26 +10,26 @@ st.markdown("""
     <style>
     /* 1. 全体の背景色 */
     .stApp {
-        background-color: #0f172a; /* 深い夜空のような紺色 */
+        background-color: #F2EAE0; /* siro */
     }
 
     /* 2. 入力ボックス（枠）の色 */
     div[data-baseweb="select"] > div, 
     div[data-baseweb="input"] > div {
-        background-color: #92aac7 !important; /* 入力欄の中を少し明るい紺に */
+        background-color: #B4D3D9 !important; /* 入力欄の中を水色に */
         color: #f1f5f9 !important; /* 入力する文字を白っぽく */
-        border: 1px solid #38bdf8 !important; /* 枠線を水色に */
+        border: 1px solid #BDA6CE !important; /* 枠線を薄紫色に */
     }
 
     /* 3. ラベル（「誕生日」などの文字）の色 */
     .stMarkdown p, label {
-        color: #e2e8f0 !important;
+        color: #9B8EC7 !important;
         font-weight: bold;
     }
 
     /* 4. 出力される鑑定結果の文字色 */
     .stAlert {
-        background-color: #1e1b4b !important; /* 結果表示の背景 */
+        background-color: #9B8EC7 !important; /* 結果表示の背景 */
         color: #fbbf24 !important; /* 星座の名前などを「金箔」のような黄色に */
         border: 2px solid #fbbf24 !important;
     }
@@ -48,11 +48,11 @@ st.markdown("""
     """, unsafe_allow_html=True)
 
 # --- 2. ロゴ画像の読み込み ---
-# GitHubに「logo.png」という名前で画像をアップロードしておくと表示されます
+# GitHubに「Lagna blueprint.png」という名前で画像をアップロードしておくと表示されます
 try:
     st.image("Lagna blueprint.png", use_container_width=True)
 except:
-    st.title("✨ ジョーティッシュ鑑定所")
+    st.title("✨ ラグナ算出")
 
 # --- 1. 都道府県データの準備 ---
 PREFECTURES = {

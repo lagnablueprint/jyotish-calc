@@ -5,7 +5,7 @@ from datetime import datetime, time, timedelta
 # --- 1. カラーパレット ---
 C_BG = "#F2EAE0"
 C_SUB = "#B4D3D9"
-C_MAIN = "#BDA6CE"
+C_MAIN = "#004aad"
 C_ACCENT = "#9B8EC7"
 
 # --- 2. デザイン (CSS) & ステルス設定 ---

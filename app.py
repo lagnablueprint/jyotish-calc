@@ -131,9 +131,18 @@ if st.button("鑑定結果を表示する"):
                 <p style="color: {C_ACCENT}; font-size: 18px; margin: 0;">
                     {int(deg_in_sign)}度 {int((deg_in_sign % 1) * 60)}分
                 </p>
-            </div>
+           </div>
             
-           <div style="text-align: center; margin-top: 60px;">
+            <div style="text-align: center; margin-top: 20px; color: {C_ACCENT};">
+                <p style="font-size: 15px; margin-bottom: 5px;">🌙 <b>ラグナから見るあなたの強み</b></p>
+                <p style="font-size: 14px; opacity: 0.9;">
+                    自分の魂の役割を知ることで、運命の歯車が回り始めます。
+                </p>
+                <div style="display: inline-block; margin-top: 10px; padding: 5px 15px; border-radius: 15px; background-color: {C_MAIN}22; border: 1px solid {C_MAIN};">
+                    <span style="font-size: 13px;">ラッキーカラー：パールホワイト、淡いパープル</span>
+                </div>
+            </div>
+            <div style="text-align: center; margin-top: 40px;">
                 <p style="color: {C_ACCENT}; font-size: 13px; margin-bottom: 12px; opacity: 0.8;">
                     ✨ さらに詳しく知りたい方はこちら ✨
                 </p>

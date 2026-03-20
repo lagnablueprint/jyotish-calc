@@ -8,51 +8,37 @@ C_SUB = "#B4D3D9"
 C_MAIN = "#BDA6CE"
 C_ACCENT = "#9B8EC7"
 
-# --- 2. ページ設定とデザイン (CSS) ---
+# --- 2. デザイン (CSS) & ステルス設定 ---
 st.set_page_config(page_title="Lagna Blueprint", page_icon="✨")
 
-# デザイン設定：アカウント名やメニューを完全に隠しつつ、指定のカラーを反映させます
 st.markdown(f"""
     <style>
-    /* 1. ヘッダー（GitHubアイコン等）を完全に消去 */
-    header[data-testid="stHeader"] {{
+    /* アカウント名やヘッダー・フッターを完全に隠す */
+    header[data-testid="stHeader"], footer, #MainMenu {{
         display: none !important;
     }}
-
-    /* 2. フッター（アカウント名等）を完全に消去 */
-    footer {{
+    .stAppToolbar {{
         display: none !important;
     }}
-
-    /* 3. メニューボタンを完全に消去 */
-    #MainMenu {{
-        display: none !important;
-    }}
-
-    /* 4. 余白の調整（ヘッダーを消した分、上に詰めすぎないようにする） */
     .block-container {{
         padding-top: 2rem !important;
     }}
-
-    /* 5. 全体の背景色 */
-    .stApp {{
-        background-color: {C_BG};
+    /* 全体の背景色と文字色 */
+    .stApp {{ background-color: {C_BG}; }}
+    h1, h2, h3, label {{ color: {C_ACCENT} !important; font-weight: bold; }}
+    .stButton>button {{
+        background: linear-gradient(135deg, {C_MAIN}, {C_ACCENT});
+        color: white !important; border-radius: 25px; border: none;
+        height: 3.5em; width: 100%; font-weight: bold;
     }}
-    
-    /* 6. ラベルやタイトルの色 */
-    h1, h2, h3, label {{
-        color: {C_ACCENT} !important;
-        font-weight: bold;
-    }}
+    .stDateInput div, .stTimeInput div, .stSelectbox div {{ background-color: white !important; }}
     </style>
     """, unsafe_allow_html=True)
 
 # --- 3. ヘッダー画像の表示 ---
-# 画像ファイル名「Lagna blueprint.png」を表示させます
 try:
     st.image("Lagna blueprint.png", use_container_width=True)
 except:
-    # 画像が読み込めない場合のバックアップタイトル
     st.title("✨ Lagna Blueprint")
 
 # --- 1. 都道府県データの準備 ---
@@ -74,35 +60,30 @@ PREFECTURES = {
     "熊本県": [32.7898, 130.7417], "大分県": [33.2382, 131.6126], "宮崎県": [31.9077, 131.4202],
     "鹿児島県": [31.5601, 130.5580], "沖縄県": [26.2124, 127.6809]
 }
-# --- 5. 入力フォーム（初期値1980年、範囲1950年〜） ---
+# --- 5. 入力フォーム ---
 birth_date = st.date_input(
     "1. 誕生日を選択", 
-    value=datetime(1980, 1, 1),
-    min_value=datetime(1950, 1, 1),
+    value=datetime(1980, 7, 20),
+    min_value=datetime(1960, 1, 1),
     max_value=datetime.now()
 )
 birth_time = st.time_input("2. 出生時刻", value=time(10, 58), step=60)
 pref_name = st.selectbox("3. 出生地", list(PREFECTURES.keys()), index=0)
 
+# --- 6. 鑑定ロジック ---
 if st.button("鑑定結果を表示する"):
     try:
-        # 1. 時間計算 (JST -> UT)
+        # 時間計算 (JST -> UT)
         dt_local = datetime.combine(birth_date, birth_time)
         dt_ut = dt_local - timedelta(hours=9)
-        
-        # ユリウス日の計算
         jd_ut = swe.julday(dt_ut.year, dt_ut.month, dt_ut.day, dt_ut.hour + dt_ut.minute/60.0)
 
-        # 2. アヤナムシャ設定 (Lahiri) を強制適用
+        # サイドリアル（恒星時）計算の強制設定
         swe.set_sid_mode(swe.SIDM_LAHIRI, 0, 0)
-        
-        # 3. ラグナ算出
-        # 都道府県データから座標取得
         lat, lon = PREFECTURES[pref_name]
         
-        # 【重要】flags=swe.FLG_SIDEREAL (64) を明示的に指定してサイドリアル計算を強制
-        # これにより西洋式の星座（天秤座）ではなくインド式の星座（乙女座）が算出されます
-        res = swe.houses_ex(jd_ut, lat, lon, b'W', flags=swe.FLG_SIDEREAL)
+        # flags=64 で西洋式とのズレ（アヤナムシャ）を正しく補正
+        res = swe.houses_ex(jd_ut, lat, lon, b'W', flags=64)
         lagna_deg = res[1][0]
 
         zodiac_signs = ["牡羊座", "牡牛座", "双子座", "蟹座", "獅子座", "乙女座", 
@@ -110,14 +91,13 @@ if st.button("鑑定結果を表示する"):
         sign_index = int(lagna_deg / 30)
         deg_in_sign = lagna_deg % 30
 
-        # --- 4. 結果表示 ---
+        # --- 7. 結果表示 & BASEボタン ---
         st.markdown("---")
         st.balloons()
         
-        # 【重要】ここにあなたのBASEショップのURL
-        shop_url = "https://lagnablue.base.shop/" 
+        # 【重要】ここにあなたのショップURLを入れてください
+        shop_url = "https://yourshop.base.shop/" 
 
-        # HTMLを組み立てる（onclickイベントを排除し、純粋なリンク構造にします）
         st.markdown(f"""
             <div style="background-color: white; padding: 30px; border-radius: 20px; 
                         border: 3px solid {C_MAIN}; text-align: center;
@@ -134,21 +114,18 @@ if st.button("鑑定結果を表示する"):
                 <p style="color: {C_ACCENT}; font-size: 13px; margin-bottom: 12px; opacity: 0.8;">
                     ✨ さらに詳しく知りたい方はこちら ✨
                 </p>
-                <a href="{shop_url}" target="_blank" rel="noopener noreferrer" style="text-decoration: none !important;">
+                <a href="{shop_url}" target="_blank" rel="noopener noreferrer" style="text-decoration: none;">
                     <span style="
                         background: linear-gradient(135deg, {C_MAIN}, {C_ACCENT});
-                        color: white !important; 
-                        padding: 12px 30px; 
-                        border-radius: 50px;
-                        font-weight: bold; 
-                        font-size: 16px; 
-                        display: inline-block;
-                        box-shadow: 0 4px 12px rgba(155, 142, 199, 0.3);
-                        border: none;
-                        text-decoration: none !important;
+                        color: white !important; padding: 12px 30px; border-radius: 50px;
+                        font-weight: bold; font-size: 16px; display: inline-block;
+                        box-shadow: 0 4px 12px rgba(155, 142, 199, 0.3); text-decoration: none;
                     ">
                         個人鑑定を申し込む
                     </span>
                 </a>
             </div>
         """, unsafe_allow_html=True)
+
+    except Exception as e:
+        st.error(f"エラーが発生しました。入力内容を確認してください。")

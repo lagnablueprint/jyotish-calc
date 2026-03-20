@@ -114,9 +114,10 @@ if st.button("鑑定結果を表示する"):
         st.markdown("---")
         st.balloons()
         
-        # 【重要】あなたのBASEショップURLをここに入れてください
-        base_shop_url = "https://lagnablue.base.shop/" 
+        # 【重要】ここにあなたのBASEショップのURL
+        shop_url = "https://lagnablue.base.shop/" 
 
+        # HTMLを組み立てる（onclickイベントを排除し、純粋なリンク構造にします）
         st.markdown(f"""
             <div style="background-color: white; padding: 30px; border-radius: 20px; 
                         border: 3px solid {C_MAIN}; text-align: center;
@@ -133,18 +134,21 @@ if st.button("鑑定結果を表示する"):
                 <p style="color: {C_ACCENT}; font-size: 13px; margin-bottom: 12px; opacity: 0.8;">
                     ✨ さらに詳しく知りたい方はこちら ✨
                 </p>
-                <a href="{{base_shop_url}}" target="_blank" style="text-decoration: none;">
-                    <div style="
+                <a href="{shop_url}" target="_blank" rel="noopener noreferrer" style="text-decoration: none !important;">
+                    <span style="
                         background: linear-gradient(135deg, {C_MAIN}, {C_ACCENT});
-                        color: white; padding: 10px 24px; border-radius: 50px;
-                        font-weight: bold; font-size: 15px; display: inline-block;
-                        box-shadow: 0 3px 10px rgba(155, 142, 199, 0.3);
+                        color: white !important; 
+                        padding: 12px 30px; 
+                        border-radius: 50px;
+                        font-weight: bold; 
+                        font-size: 16px; 
+                        display: inline-block;
+                        box-shadow: 0 4px 12px rgba(155, 142, 199, 0.3);
+                        border: none;
+                        text-decoration: none !important;
                     ">
                         個人鑑定を申し込む
-                    </div>
+                    </span>
                 </a>
             </div>
         """, unsafe_allow_html=True)
-
-    except Exception as e:
-        st.error(f"エラーが発生しました: {{e}}")

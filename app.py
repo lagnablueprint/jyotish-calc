@@ -75,16 +75,15 @@ if st.button("鑑定結果を表示する"):
 
         lat, lon = PREFECTURES[pref_name]
         
-        # 精密計算：まず西洋式のアセンダント角度を算出
-        # houses 関数の戻り値 [0][0] がアセンダントです
-        res = swe.houses(jd_ut, lat, lon, b'W')
-        tropical_asc = res[0][0]
+        # ハウスシステムをPlacidus(P)に固定して、西洋式アセンダントを算出
+        res = swe.houses(jd_ut, lat, lon, b'P')
+        tropical_asc = res[0][0] 
         
-        # ラヒリ・アヤナムシャの値を取得
+        # ラヒリ・アヤナムシャを取得
         swe.set_sid_mode(swe.SIDM_LAHIRI, 0, 0)
         ayanamsa = swe.get_ayanamsa_ex(jd_ut, 64)[0]
         
-        # 手動で引き算（西洋式 - アヤナムシャ = インド式）
+        # 数値的に引き算（360度法）
         lagna_deg = (tropical_asc - ayanamsa) % 360
 
         zodiac_signs = ["牡羊座", "牡牛座", "双子座", "蟹座", "獅子座", "乙女座", 
@@ -105,6 +104,7 @@ if st.button("鑑定結果を表示する"):
             "感受性が豊かな、全てを包み込む優しさがあります。"
         ]
 
+        # 角度から星座のインデックスを決定
         sign_index = int(lagna_deg / 30)
         deg_in_sign = lagna_deg % 30
         sign_name = zodiac_signs[sign_index]

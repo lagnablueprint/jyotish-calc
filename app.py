@@ -114,7 +114,7 @@ if st.button("鑑定結果を表示する"):
         st.markdown("---")
         st.balloons()
         
-        # BASEショップのURL
+        # 【重要】あなたのBASEショップURLをここに入れてください
         base_shop_url = "https://lagnablue.base.shop/" 
 
         st.markdown(f"""

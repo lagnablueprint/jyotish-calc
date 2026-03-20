@@ -11,7 +11,7 @@ C_ACCENT = "#9B8EC7"
 # --- 2. デザイン (CSS) & ステルス設定 ---
 st.set_page_config(page_title="Lagna Blueprint", page_icon="✨")
 
-# CSS内の波括弧を二重 {{ }} にすることで、f文字列との干渉を完全に防ぎます
+# CSS内の波括弧のみ、二重 {{ }} にする必要があります
 st.markdown(f"""
     <style>
     header[data-testid="stHeader"], footer, #MainMenu {{ display: none !important; }}
@@ -44,8 +44,8 @@ try:
 except:
     st.title("✨ Lagna Blueprint")
 
-# --- 4. 都道府県データ (辞書形式で安定化) ---
-PREFECTURES = {{
+# --- 4. 都道府県データ (通常のコードなので波括弧は一つずつ) ---
+PREFECTURES = {
     "北海道": [43.0641, 141.3469], "青森県": [40.8244, 140.7400], "岩手県": [39.7036, 141.1527],
     "宮城県": [38.2682, 140.8694], "秋田県": [39.7186, 140.1024], "山形県": [38.2554, 140.3396],
     "福島県": [37.7503, 140.4675], "茨城県": [36.3418, 140.4468], "栃木県": [36.5657, 139.8835],
@@ -62,7 +62,7 @@ PREFECTURES = {{
     "福岡県": [33.6064, 130.4182], "佐賀県": [33.2635, 130.2998], "長崎県": [32.7448, 129.8737],
     "熊本県": [32.7898, 130.7417], "大分県": [33.2382, 131.6126], "宮崎県": [31.9111, 131.4239],
     "鹿児島県": [31.5967, 130.5571], "沖縄県": [26.2124, 127.6809]
-}}
+}
 
 # --- 5. 入力フォーム ---
 birth_date = st.date_input("1. 誕生日を選択", value=datetime(1980, 7, 20))
@@ -78,12 +78,10 @@ if st.button("鑑定結果を表示する"):
 
         lat, lon = PREFECTURES[pref_name]
         
-        # 手動補正ロジックで「天秤座への逆戻り」を物理的に阻止
-        swe.set_tid_mode(swe.SIDM_LAHIRI, 0, 0)
+        # 引き算ロジックで「乙女座」を確定させる
+        swe.set_sid_mode(swe.SIDM_LAHIRI, 0, 0)
         res = swe.houses_ex(jd_ut, lat, lon, b'W')
         tropical_lagna = res[1][0]
-        
-        # アヤナムシャを直接取得して引き算
         ayanamsa = swe.get_ayanamsa_ex(jd_ut)[0]
         lagna_deg = (tropical_lagna - ayanamsa) % 360
 
@@ -143,4 +141,4 @@ if st.button("鑑定結果を表示する"):
         """, unsafe_allow_html=True)
 
     except Exception as e:
-        st.error("エラーが発生しました。入力内容を確認してください。")
+        st.error(f"エラーが発生しました: {e}")

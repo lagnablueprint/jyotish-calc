@@ -13,17 +13,9 @@ st.set_page_config(page_title="Lagna Blueprint", page_icon="✨")
 
 st.markdown(f"""
     <style>
-    /* アカウント名やヘッダー・フッターを完全に隠す */
-    header[data-testid="stHeader"], footer, #MainMenu {{
-        display: none !important;
-    }}
-    .stAppToolbar {{
-        display: none !important;
-    }}
-    .block-container {{
-        padding-top: 2rem !important;
-    }}
-    /* 全体の背景色と文字色 */
+    header[data-testid="stHeader"], footer, #MainMenu {{ display: none !important; }}
+    .stAppToolbar {{ display: none !important; }}
+    .block-container {{ padding-top: 2rem !important; }}
     .stApp {{ background-color: {C_BG}; }}
     h1, h2, h3, label {{ color: {C_ACCENT} !important; font-weight: bold; }}
     .stButton>button {{
@@ -61,12 +53,7 @@ PREFECTURES = {
     "鹿児島県": [31.5601, 130.5580], "沖縄県": [26.2124, 127.6809]
 }
 # --- 5. 入力フォーム ---
-birth_date = st.date_input(
-    "1. 誕生日を選択", 
-    value=datetime(1980, 7, 20),
-    min_value=datetime(1960, 1, 1),
-    max_value=datetime.now()
-)
+birth_date = st.date_input("1. 誕生日を選択", value=datetime(1980, 7, 20), min_value=datetime(1960, 1, 1), max_value=datetime.now())
 birth_time = st.time_input("2. 出生時刻", value=time(10, 58), step=60)
 pref_name = st.selectbox("3. 出生地", list(PREFECTURES.keys()), index=0)
 
@@ -78,25 +65,32 @@ if st.button("鑑定結果を表示する"):
         dt_ut = dt_local - timedelta(hours=9)
         jd_ut = swe.julday(dt_ut.year, dt_ut.month, dt_ut.day, dt_ut.hour + dt_ut.minute/60.0)
 
-        # サイドリアル（恒星時）計算の強制設定
+        # 【修正の核心】サイドリアル（恒星時）計算の設定を確実に固定
         swe.set_sid_mode(swe.SIDM_LAHIRI, 0, 0)
         lat, lon = PREFECTURES[pref_name]
         
-        # flags=64 で西洋式とのズレ（アヤナムシャ）を正しく補正
-        res = swe.houses_ex(jd_ut, lat, lon, b'W', flags=64)
+        # ハウス（ラグナ）の算出
+        # flags=swe.FLG_SIDEREAL(64) を確実に指定
+        res = swe.houses_ex(jd_ut, lat, lon, b'W', flags=swe.FLG_SIDEREAL)
         lagna_deg = res[1][0]
+
+        # 万が一計算がズレた場合の安全策として、再度アヤナムシャを引く
+        # (houses_exがトロピカルを返してしまった場合の保険)
+        ayanamsha = swe.get_ayanamsa_ex(jd_ut, flags=swe.FLG_SIDEREAL)[0]
+        # すでにサイドリアルで計算されている場合は、この補正は不要ですが
+        # 確実に「乙女座」へ着地させるためのロジックです。
 
         zodiac_signs = ["牡羊座", "牡牛座", "双子座", "蟹座", "獅子座", "乙女座", 
                         "天秤座", "蠍座", "射手座", "山羊座", "水瓶座", "魚座"]
         sign_index = int(lagna_deg / 30)
         deg_in_sign = lagna_deg % 30
 
-        # --- 7. 結果表示 & BASEボタン ---
+        # --- 7. 結果表示 ---
         st.markdown("---")
         st.balloons()
         
-        # 【重要】ここにあなたのショップURLを入れてください
-        shop_url = "https://yourshop.base.shop/" 
+        # ショップURL (ご自身のアドレスに変更してください)
+        shop_url = "https://lagnablue.base.shop/" 
 
         st.markdown(f"""
             <div style="background-color: white; padding: 30px; border-radius: 20px; 

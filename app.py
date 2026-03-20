@@ -65,11 +65,11 @@ PREFECTURES = {
 today = datetime.now()
 birth_date = st.date_input(
     "1. 誕生日を選択", 
-    value=datetime(1980, 7, 20),
+    value=datetime(1980, 1, 1),
     min_value=datetime(1950, 1, 1),
     max_value=today
 )
-birth_time = st.time_input("2. 出生時刻", value=time(10, 58))
+birth_time = st.time_input("2. 出生時刻", value=time(12, 00))
 pref_name = st.selectbox("3. 出生地", list(PREFECTURES.keys()))
 
 # --- 6. 鑑定ロジック ---
@@ -124,7 +124,7 @@ if st.button("鑑定結果を表示する"):
         st.markdown("---")
         st.balloons()
         
-        shop_url = "https://yourshop.base.shop/"
+        shop_url = "https://lagnablue.base.shop/"
 
         st.markdown(f"""
             <div style="background-color: white; padding: 30px; border-radius: 20px; 

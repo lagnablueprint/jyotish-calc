@@ -111,7 +111,7 @@ if st.button("鑑定結果を表示する"):
                 <a href="{shop_url}" target="_blank" rel="noopener noreferrer" style="text-decoration: none !important;">
                     <span style="
                         background: linear-gradient(135deg, {C_MAIN}, {C_ACCENT});
-                        color: #FFFFFF !important; 
+                        color: {C_BG} !important; 
                         padding: 12px 30px; 
                         border-radius: 50px;
                         font-weight: 800; 
@@ -119,6 +119,7 @@ if st.button("鑑定結果を表示する"):
                         display: inline-block;
                         box-shadow: 0 4px 12px rgba(155, 142, 199, 0.4);
                         text-decoration: none !important;
+                        -webkit-text-fill-color: {C_BG} !important;
                     ">
                         個人鑑定を申し込む
                     </span>

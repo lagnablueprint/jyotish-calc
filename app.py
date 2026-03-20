@@ -41,7 +41,7 @@ try:
 except:
     st.title("✨ Lagna Blueprint")
 
-# --- 4. 都道府県データ（波括弧は1つずつで正解です） ---
+# --- 4. 都道府県データ ---
 PREFECTURES = {
     "北海道": [43.0641, 141.3469], "青森県": [40.8244, 140.7400], "岩手県": [39.7036, 141.1527],
     "宮城県": [38.2682, 140.8694], "秋田県": [39.7186, 140.1024], "山形県": [38.2554, 140.3396],
@@ -75,12 +75,16 @@ if st.button("鑑定結果を表示する"):
 
         lat, lon = PREFECTURES[pref_name]
         
-        # 精密計算：Lahiri(インド式)を固定してハウス算出
+        # ハウス計算を西洋式（トロピカル）で実行
+        res = swe.houses(jd_ut, lat, lon, b'W')
+        tropical_asc = res[0][0]
+        
+        # ラヒリ・アヤナムシャの値を強制的に取得
         swe.set_sid_mode(swe.SIDM_LAHIRI, 0, 0)
-        # houses_exの引数：(ユリウス日, 緯度, 経度, ハウスシステム'W'など, フラグ64)
-        # res[1][0]がアセンダント（ラグナ）
-        res = swe.houses_ex(jd_ut, lat, lon, b'P', flags=64)
-        lagna_deg = res[1][0]
+        ayanamsa = swe.get_ayanamsa_ex(jd_ut, 64)[0]
+        
+        # 西洋式の角度からアヤナムシャを手動で引き算（これが最も確実です）
+        lagna_deg = (tropical_asc - ayanamsa) % 360
 
         zodiac_signs = ["牡羊座", "牡牛座", "双子座", "蟹座", "獅子座", "乙女座", 
                         "天秤座", "蠍座", "射手座", "山羊座", "水瓶座", "魚座"]
@@ -152,4 +156,4 @@ if st.button("鑑定結果を表示する"):
         """, unsafe_allow_html=True)
 
     except Exception as e:
-        st.error(f"エラーが発生しました。入力内容を確認してください。")
+        st.error(f"エラーが発生しました: {{e}}")

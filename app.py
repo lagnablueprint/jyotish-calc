@@ -11,7 +11,6 @@ C_ACCENT = "#9B8EC7"
 # --- 2. デザイン (CSS) & ステルス設定 ---
 st.set_page_config(page_title="Lagna Blueprint", page_icon="✨")
 
-# CSS内の波括弧のみ、二重 {{ }} にする必要があります
 st.markdown(f"""
     <style>
     header[data-testid="stHeader"], footer, #MainMenu {{ display: none !important; }}
@@ -20,7 +19,6 @@ st.markdown(f"""
     .stApp {{ background-color: {C_BG}; }}
     h1, h2, h3, label {{ color: {C_ACCENT} !important; font-weight: bold; }}
 
-    /* スマホでの入力文字の色を強制固定 */
     input, .stSelectbox div[data-baseweb="select"] {{
         color: {C_ACCENT} !important;
         -webkit-text-fill-color: {C_ACCENT} !important;
@@ -44,7 +42,7 @@ try:
 except:
     st.title("✨ Lagna Blueprint")
 
-# --- 4. 都道府県データ (通常のコードなので波括弧は一つずつ) ---
+# --- 4. 都道府県データ ---
 PREFECTURES = {
     "北海道": [43.0641, 141.3469], "青森県": [40.8244, 140.7400], "岩手県": [39.7036, 141.1527],
     "宮城県": [38.2682, 140.8694], "秋田県": [39.7186, 140.1024], "山形県": [38.2554, 140.3396],
@@ -80,9 +78,13 @@ if st.button("鑑定結果を表示する"):
         
         # 引き算ロジックで「乙女座」を確定させる
         swe.set_sid_mode(swe.SIDM_LAHIRI, 0, 0)
+        
+        # 西洋式の角度を取得
         res = swe.houses_ex(jd_ut, lat, lon, b'W')
         tropical_lagna = res[1][0]
-        ayanamsa = swe.get_ayanamsa_ex(jd_ut)[0]
+        
+        # 【修正箇所】引数に 64 (SIDEREAL) を追加してエラーを解消
+        ayanamsa = swe.get_ayanamsa_ex(jd_ut, 64)[0]
         lagna_deg = (tropical_lagna - ayanamsa) % 360
 
         zodiac_signs = ["牡羊座", "牡牛座", "双子座", "蟹座", "獅子座", "乙女座", 

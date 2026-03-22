@@ -69,7 +69,6 @@ birth_date = st.date_input(
     min_value=datetime(1950, 1, 1),
     max_value=today
 )
-# step=60 を入れることで1分単位の選択になります
 birth_time = st.time_input("2. 出生時刻", value=time(10, 58), step=60)
 pref_name = st.selectbox("3. 出生地", list(PREFECTURES.keys()))
 
@@ -87,12 +86,11 @@ if st.button("鑑定結果を表示する"):
         lat, lon = PREFECTURES[pref_name]
         
         # 1. まず西洋式(Tropical)のアセンダントを算出
-        # flag = 0 (西洋式) を明示
-        res_houses = swe.houses(jd_ut, lat, lon, b'P')
-        tropical_asc = res_houses[0][0] # アセンダント
+        # swe.housesの戻り値は (cusps, ascmc) のタプルです
+        res_houses, res_ascmc = swe.houses(jd_ut, lat, lon, b'P')
+        tropical_asc = res_ascmc[0] # アセンダント
         
         # 2. Lahiriアヤナムシャの値を強制的に引き出す
-        # sid_modeをセットしてから get_ayanamsa で数値を取得
         swe.set_sid_mode(swe.SIDM_LAHIRI, 0, 0)
         ayanamsa_val = swe.get_ayanamsa(jd_ut)
         
@@ -106,6 +104,9 @@ if st.button("鑑定結果を表示する"):
         deg_in_sign = lagna_deg % 30
         sign_name = zodiac_signs[sign_index]
 
+        # 【修正】未定義だったadvice変数に空文字または定型文を代入
+        advice = f"{sign_name}の質を活かすことで、より良い流れが生まれます。"
+
         st.markdown("---")
         st.balloons()
         
@@ -117,40 +118,4 @@ if st.button("鑑定結果を表示する"):
                 <p style="color: {C_MAIN}; font-weight: bold; margin-bottom: 5px;">【鑑定結果】</p>
                 <p style="color: {C_ACCENT}; margin: 0;">あなたのラグナは</p>
                 <h1 style="color: {C_ACCENT}; font-size: 42px; margin: 10px 0;">{sign_name}</h1>
-                <p style="color: {C_ACCENT}; font-size: 18px; margin: 0;">
-                    {int(deg_in_sign)}度 {int((deg_in_sign % 1) * 60)}分
-                </p>
-            </div>
-            
-            <div style="text-align: center; margin: 30px 10px; color: {C_ACCENT};">
-                <p style="font-size: 15px; margin-bottom: 8px;">🌙 <b>{sign_name}のあなたへのメッセージ</b></p>
-                <p style="font-size: 14px; line-height: 1.6; opacity: 0.9;">
-                    {advice}
-                </p>
-            </div>
-
-            <div style="text-align: center; margin-top: 40px;">
-                <p style="color: {C_ACCENT}; font-size: 13px; margin-bottom: 12px; opacity: 0.8;">
-                    ✨ さらに詳しく知りたい方はこちら ✨
-                </p>
-                <a href="{shop_url}" target="_blank" rel="noopener noreferrer" style="text-decoration: none !important;">
-                    <span style="
-                        background: linear-gradient(135deg, {C_MAIN}, {C_ACCENT});
-                        color: {C_BG} !important; 
-                        padding: 12px 30px; 
-                        border-radius: 50px;
-                        font-weight: 800; 
-                        font-size: 16px; 
-                        display: inline-block;
-                        box-shadow: 0 4px 12px rgba(155, 142, 199, 0.4);
-                        text-decoration: none !important;
-                        -webkit-text-fill-color: {C_BG} !important;
-                    ">
-                        個人鑑定を申し込む
-                    </span>
-                </a>
-            </div>
-        """, unsafe_allow_html=True)
-
-    except Exception as e:
-        st.error(f"鑑定中にエラーが発生しました。時間を空けて再度お試しください。")
+                <p style="color
